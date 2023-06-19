@@ -24,6 +24,10 @@ export class App {
 		this.logger = logger;
 	}
 
+	useMiddleware(): void {
+		this.app.use(express.json());
+	}
+
 	useRoutes(): void {
 		this.app.use('/users', this.userController.router);
 	}
@@ -33,6 +37,7 @@ export class App {
 	}
 
 	public async init(): Promise<void> {
+		this.useMiddleware();
 		this.useRoutes();
 		this.useExeptionFilters();
 		this.server = this.app.listen(this.port);

@@ -1,3 +1,4 @@
+import { UserService } from './users.service';
 import { inject, injectable } from 'inversify';
 import { BaseController } from '../common/base.controller';
 import { IControllerRoute } from '../common/route.interface';
@@ -6,9 +7,9 @@ import { NextFunction, Request, Response } from 'express';
 import { ILogger } from '../logger/logger.interface';
 import { TYPES } from '../types';
 import { IUsersController } from './users.interface';
-
-class User {}
-const arr = [];
+import { UserLoginDto } from './dto/user-login.dto';
+import { UserRegisterDto } from './dto/user-register.dto';
+import { ValidateMiddleware } from '../common/validate.middleware';
 
 @injectable()
 export class UserController extends BaseController implements IUsersController {
@@ -22,20 +23,32 @@ export class UserController extends BaseController implements IUsersController {
 			path: '/register',
 			func: this.register,
 			method: 'post',
+			middlewares: [new ValidateMiddleware(UserRegisterDto)],
 		},
 	];
 
-	constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
+	constructor(
+		@inject(TYPES.ILogger) private loggerService: ILogger,
+		@inject(TYPES.UserService) private userService: UserService,
+	) {
 		super(loggerService);
 		this.bindRoutes(this.userRouter);
 	}
 
-	login(req: Request, res: Response, next: NextFunction): void {
-		arr.push(new User());
+	login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction): void {
+		console.log(req.body);
 		// this.ok(res, "login");
 		next(new HTTPError(401, 'ошибка авторизации'));
 	}
-	register(req: Request, res: Response, next: NextFunction): void {
-		this.ok(res, 'register');
+	async register(
+		{ body }: Request<{}, {}, UserRegisterDto>,
+		res: Response,
+		next: NextFunction,
+	): Promise<void> {
+		const result = await this.userService.createUser(body);
+		if (!result) {
+			return next(new HTTPError(422, 'Такой пользователь существует'));
+		}
+		this.ok(res, result);
 	}
 }
