@@ -1,4 +1,3 @@
-import { UsersRepository } from './users/users.repository';
 export const TYPES = {
 	Application: Symbol.for('Application'),
 	ILogger: Symbol.for('ILogger'),

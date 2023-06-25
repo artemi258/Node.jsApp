@@ -7,7 +7,6 @@ export class AuthMiddleware implements IMiddleware {
 
 	excute(req: Request, res: Response, next: NextFunction): void {
 		if (req.headers.authorization) {
-			req.headers.authorization.split(' ')[1];
 			if (this.secret) {
 				verify(req.headers.authorization.split(' ')[1], this.secret, (err, payload) => {
 					if (err) {
