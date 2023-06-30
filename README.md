@@ -12,7 +12,7 @@
 
 ## Стэк
 - JavaScript, TypeScript, Node.js, Express, Prisma, Sqlite.
-- 
+  
 ## Пример
 - post запрос '/users/register'
 - {
